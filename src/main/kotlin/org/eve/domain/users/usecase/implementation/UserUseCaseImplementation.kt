@@ -20,7 +20,7 @@ import java.util.UUID
 
 @ApplicationScoped
 class UserUseCaseImplementation(
-    @Inject var userRepository: UserRepository
+    private val userRepository: UserRepository
 ) : UserUseCase {
     @Inject
     private lateinit var encoder: PasswordEncoder
@@ -87,11 +87,9 @@ class UserUseCaseImplementation(
 
     override fun getUserByUUID(uuid: UUID): DefaultResponse<User> {
         try {
-            val user = userRepository.getUserByUUID(uuid)
-
-            if (user === null) {
-                return DefaultResponse(error = USER_NOT_FOUND)
-            }
+            val user = userRepository.getUserByUUID(uuid) ?: return DefaultResponse(
+                error = USER_NOT_FOUND
+            )
 
             return DefaultResponse(
                 data = user,

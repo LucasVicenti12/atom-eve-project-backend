@@ -1,13 +1,11 @@
 package org.eve.infra.users.database
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
-import io.quarkus.hibernate.orm.panache.PanacheQuery
-import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
-import io.quarkus.panache.common.Page
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.*
 import org.eve.domain.users.entities.User
 import org.eve.domain.users.entities.UserType
+import org.eve.utils.jpa.EveBaseJPA
 import java.util.*
 
 @Entity
@@ -18,20 +16,20 @@ class UserJPA : PanacheEntityBase() {
     @get:Column(name = "uuid", nullable = false)
     var uuid: UUID? = null
 
-    @get:Column(nullable = false)
+    @get:Column(name = "username", nullable = false)
     var username: String? = null
 
-    @get:Column(nullable = false)
+    @get:Column("password", nullable = false)
     var password: String? = null
 
     @get:Enumerated(EnumType.ORDINAL)
-    @get:Column(nullable = false)
+    @get:Column(name = "user_type", nullable = false)
     var userType: UserType? = null
 
-    @get:Column(nullable = false)
+    @get:Column(name = "name", nullable = false)
     var name: String? = null
 
-    @get:Column(nullable = false)
+    @get:Column("email", nullable = false)
     var email: String? = null
 
     fun toUserWithPassword(): User = User(
@@ -54,10 +52,10 @@ class UserJPA : PanacheEntityBase() {
 }
 
 @ApplicationScoped
-class UserRepositoryJPA : PanacheRepositoryBase<UserJPA, UUID> {
+class UserRepositoryJPA : EveBaseJPA<UserJPA, UUID>() {
     fun updateUser(user: User) {
         this.update(
-            "userType = :userType, name = :name, email = :email WHERE uuid = :uuid",
+            "user_type = :userType, name = :name, email = :email WHERE uuid = :uuid",
             mapOf(
                 "userType" to user.userType,
                 "name" to user.name,
@@ -71,8 +69,4 @@ class UserRepositoryJPA : PanacheRepositoryBase<UserJPA, UUID> {
         "username",
         username
     ).firstResult()
-
-    fun findPaginated(page: Int, count: Int): PanacheQuery<UserJPA> = findAll().page(
-        Page(page, count)
-    )
 }
