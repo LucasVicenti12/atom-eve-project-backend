@@ -12,7 +12,7 @@ import java.util.*
 
 @ApplicationScoped
 class UserRepositoryImplementation(
-    private val userRepositoryJPA: UserRepositoryJPA
+    private val userRepositoryJPA: UserRepositoryJPA,
 ) : UserRepository {
 
     @Transactional
@@ -20,7 +20,7 @@ class UserRepositoryImplementation(
         val userJPA = UserJPA().apply {
             this.username = user.username
             this.password = user.password
-            this.userType = user.userType
+            this.status = user.status
             this.name = user.name
             this.email = user.email
         }
@@ -37,12 +37,15 @@ class UserRepositoryImplementation(
         return userRepositoryJPA.findById(user.uuid!!)?.toUserWithoutPassword()
     }
 
+    @Transactional
     override fun getUserByUUID(uuid: UUID): User? =
         userRepositoryJPA.findById(uuid)?.toUserWithoutPassword()
 
+    @Transactional
     override fun getUserByUserName(username: String): User? =
         userRepositoryJPA.findByUsername(username)?.toUserWithPassword()
 
+    @Transactional
     override fun getPaginatedUsers(
         page: Int,
         count: Int

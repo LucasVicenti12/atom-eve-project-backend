@@ -1,6 +1,7 @@
 package org.eve.infra.platforms.repository
 
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.transaction.Transactional
 import org.eve.domain.platforms.entities.Platform
 import org.eve.domain.platforms.repository.PlatformRepository
 import org.eve.infra.platforms.database.PlatformJPA
@@ -13,6 +14,7 @@ import java.util.UUID
 class PlatformRepositoryImplementation(
     private val platformRepositoryJPA: PlatformRepositoryJPA
 ) : PlatformRepository {
+    @Transactional
     override fun createPlatform(
         platform: Platform,
         projectUUID: UUID
@@ -29,18 +31,21 @@ class PlatformRepositoryImplementation(
 
         platformRepositoryJPA.persist(platformJPA)
 
-        return platformJPA.toPlatform()
+        return platformJPA.toPlatformWithoutProject()
     }
 
+    @Transactional
     override fun updatePlatform(platform: Platform): Platform? {
         platformRepositoryJPA.updatePlatform(platform)
 
         return platformRepositoryJPA.findById(platform.uuid!!)?.toPlatform()
     }
 
+    @Transactional
     override fun getPlatformByUUID(uuid: UUID): Platform? =
         platformRepositoryJPA.findById(uuid)?.toPlatform()
 
+    @Transactional
     override fun getPaginatedPlatforms(
         page: Int,
         count: Int
@@ -61,8 +66,10 @@ class PlatformRepositoryImplementation(
         )
     }
 
-    override fun getAllPlatforms(): List<Platform> = platformRepositoryJPA.findAll().list<PlatformJPA>()
+    @Transactional
+    override fun getAllPlatforms(projectUUID: UUID): List<Platform> = platformRepositoryJPA
+        .getPlatformsByProjectUUID(projectUUID)
         .map {
-            it.toPlatform()
+            it.toPlatformWithoutProject()
         }
 }

@@ -11,5 +11,5 @@ interface PlatformUseCase {
     fun getPlatformByUUID(uuid: UUID): DefaultResponse<Platform>
 
     fun getPaginatedPlatforms(page: Int, count: Int): DefaultResponse<Pagination<Platform>>
-    fun getAllPlatforms(): DefaultResponse<List<Platform>>
+    fun getAllPlatforms(projectUUID: UUID): DefaultResponse<List<Platform>>
 }

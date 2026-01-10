@@ -21,6 +21,7 @@ class UserWebService(
     private val userUseCase: UserUseCase
 ) {
     @POST
+    @Path("/register")
     fun createUser(user: User): Response {
         val response = userUseCase.createUser(user)
 
@@ -34,6 +35,7 @@ class UserWebService(
     }
 
     @PUT
+    @Path("/update")
     fun updateUser(user: User): Response {
         val response = userUseCase.updateUser(user)
 

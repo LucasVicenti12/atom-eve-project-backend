@@ -10,7 +10,7 @@ import org.eve.domain.platforms.repository.PlatformRepository
 import org.eve.domain.platforms.usecase.PlatformUseCase
 import org.eve.utils.entities.DefaultResponse
 import org.eve.utils.entities.Pagination
-import org.eve.utils.entities.UNEXPECTED_ERROR
+import org.eve.utils.exceptions.UNEXPECTED_ERROR
 import java.util.UUID
 
 @ApplicationScoped
@@ -89,10 +89,10 @@ class PlatformUseCaseImplementation(
         }
     }
 
-    override fun getAllPlatforms(): DefaultResponse<List<Platform>> {
+    override fun getAllPlatforms(projectUUID: UUID): DefaultResponse<List<Platform>> {
         try {
             return DefaultResponse(
-                data = platformRepository.getAllPlatforms()
+                data = platformRepository.getAllPlatforms(projectUUID)
             )
         } catch (e: Exception) {
             logger.error("ERROR_ON_GET_ALL_PLATFORMS", e)

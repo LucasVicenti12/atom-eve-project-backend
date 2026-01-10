@@ -81,9 +81,11 @@ class PlatformWebService(
     }
 
     @GET
-    @Path("/all")
-    fun getAllPlatforms(): Response {
-        val response = platformUseCase.getAllPlatforms()
+    @Path("/all/{uuid}")
+    fun getAllPlatforms(
+        @PathParam(value = "uuid") uuid: UUID
+    ): Response {
+        val response = platformUseCase.getAllPlatforms(uuid)
 
         if (response.error != null) {
             return Response.status(

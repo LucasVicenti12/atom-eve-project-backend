@@ -11,4 +11,8 @@ interface ProjectUseCase {
 
     fun getProjectByUUID(uuid: UUID): DefaultResponse<Project>
     fun getPaginatedProjects(page: Int, count: Int): DefaultResponse<Pagination<Project>>
+    fun getAllProjects(): DefaultResponse<List<Project>>
+
+    fun addMemberToProject(projectUUID: UUID, userUUID: UUID): DefaultResponse<Unit>
+    fun removeMemberFromProject(projectUUID: UUID, userUUID: UUID): DefaultResponse<Unit>
 }

@@ -1,7 +1,7 @@
-package org.eve.utils.services
+package org.eve.utils.entities
 
-import jakarta.enterprise.context.ApplicationScoped
+import jakarta.inject.Singleton
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
-@ApplicationScoped
+@Singleton
 class PasswordEncoder: BCryptPasswordEncoder()

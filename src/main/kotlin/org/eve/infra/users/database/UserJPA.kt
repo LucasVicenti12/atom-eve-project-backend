@@ -4,8 +4,9 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.*
 import org.eve.domain.users.entities.User
-import org.eve.domain.users.entities.UserType
-import org.eve.utils.jpa.EveBaseJPA
+import org.eve.domain.users.entities.UserStatus
+import org.eve.utils.entities.EveBaseJPA
+import java.time.LocalDateTime
 import java.util.*
 
 @Entity
@@ -22,32 +23,42 @@ class UserJPA : PanacheEntityBase() {
     @get:Column("password", nullable = false)
     var password: String? = null
 
-    @get:Enumerated(EnumType.ORDINAL)
-    @get:Column(name = "user_type", nullable = false)
-    var userType: UserType? = null
-
     @get:Column(name = "name", nullable = false)
     var name: String? = null
 
     @get:Column("email", nullable = false)
     var email: String? = null
 
+    @get:Enumerated(EnumType.ORDINAL)
+    @get:Column(name = "status", nullable = false)
+    var status: UserStatus? = null
+
+    @get:Column(name = "created_at", nullable = false, updatable = false)
+    var createdAt: LocalDateTime = LocalDateTime.now()
+
+    @get:Column(name = "modified_at", nullable = false)
+    var modifiedAt: LocalDateTime = LocalDateTime.now()
+
     fun toUserWithPassword(): User = User(
         uuid = this.uuid,
         username = this.username!!,
-        password = this.password,
-        userType = this.userType!!,
+        password = this.password!!,
         name = this.name!!,
         email = this.email!!,
+        status = this.status,
+        createdAt = this.createdAt,
+        modifiedAt = this.modifiedAt
     )
 
     fun toUserWithoutPassword(): User = User(
         uuid = this.uuid,
         username = this.username!!,
         password = null,
-        userType = this.userType!!,
         name = this.name!!,
         email = this.email!!,
+        status = this.status,
+        createdAt = this.createdAt,
+        modifiedAt = this.modifiedAt
     )
 }
 
@@ -55,11 +66,11 @@ class UserJPA : PanacheEntityBase() {
 class UserRepositoryJPA : EveBaseJPA<UserJPA, UUID>() {
     fun updateUser(user: User) {
         this.update(
-            "user_type = :userType, name = :name, email = :email WHERE uuid = :uuid",
+            "name = :name, email = :email, status = :status WHERE uuid = :uuid",
             mapOf(
-                "userType" to user.userType,
                 "name" to user.name,
                 "email" to user.email,
+                "status" to user.status,
                 "uuid" to user.uuid
             )
         )

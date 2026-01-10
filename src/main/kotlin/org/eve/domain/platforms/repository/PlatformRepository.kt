@@ -10,5 +10,5 @@ interface PlatformRepository {
     fun getPlatformByUUID(uuid: UUID): Platform?
 
     fun getPaginatedPlatforms(page: Int, count: Int): Pagination<Platform>
-    fun getAllPlatforms(): List<Platform>
+    fun getAllPlatforms(projectUUID: UUID): List<Platform>
 }

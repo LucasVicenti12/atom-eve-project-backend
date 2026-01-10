@@ -15,19 +15,24 @@ val quarkusPlatformVersion: String by project
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
-    implementation("io.quarkus:quarkus-jsonb")
-    implementation("io.quarkus:quarkus-rest-jsonb")
-    implementation("io.quarkus:quarkus-kotlin")
-    implementation("io.quarkus:quarkus-hibernate-orm-panache")
-    implementation("io.quarkus:quarkus-smallrye-jwt")
-    implementation("io.quarkus:quarkus-spring-data-jpa")
-    implementation("io.quarkus:quarkus-jdbc-mysql")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("io.quarkus:quarkus-arc")
-    implementation("io.quarkus:quarkus-hibernate-orm")
+
     implementation("io.quarkus:quarkus-rest")
-    implementation("org.springframework.security:spring-security-crypto:7.0.2")
+    implementation("io.quarkus:quarkus-rest-jsonb")
+
+    implementation("io.quarkus:quarkus-kotlin")
+    implementation("io.quarkus:quarkus-arc")
+    implementation("io.quarkus:quarkus-security")
+    implementation("io.quarkus:quarkus-smallrye-jwt")
+
+    implementation("io.quarkus:quarkus-hibernate-orm")
+    implementation("io.quarkus:quarkus-hibernate-orm-panache")
+    implementation("io.quarkus:quarkus-jdbc-mysql")
+
     implementation("io.quarkus:quarkus-smallrye-openapi")
+    implementation("org.springframework.security:spring-security-crypto:7.0.2")
+
+    implementation("io.quarkus:quarkus-vertx-http")
+
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
 }

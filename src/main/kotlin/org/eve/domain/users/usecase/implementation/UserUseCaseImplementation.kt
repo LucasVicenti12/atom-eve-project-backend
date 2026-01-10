@@ -14,13 +14,13 @@ import org.eve.domain.users.repository.UserRepository
 import org.eve.domain.users.usecase.UserUseCase
 import org.eve.utils.entities.DefaultResponse
 import org.eve.utils.entities.Pagination
-import org.eve.utils.entities.UNEXPECTED_ERROR
+import org.eve.utils.exceptions.UNEXPECTED_ERROR
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.UUID
 
 @ApplicationScoped
 class UserUseCaseImplementation(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : UserUseCase {
     @Inject
     private lateinit var encoder: PasswordEncoder

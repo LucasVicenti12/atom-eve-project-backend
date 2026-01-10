@@ -1,4 +1,4 @@
-package org.eve.utils.jpa
+package org.eve.utils.entities
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase

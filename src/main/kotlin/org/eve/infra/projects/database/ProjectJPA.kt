@@ -5,15 +5,21 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import org.eve.domain.projects.entities.Project
+import org.eve.domain.projects.entities.ProjectStatus
 import org.eve.infra.platforms.database.PlatformJPA
-import org.eve.utils.jpa.EveBaseJPA
+import org.eve.infra.users.database.UserJPA
+import org.eve.utils.entities.EveBaseJPA
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
@@ -24,8 +30,8 @@ class ProjectJPA : PanacheEntityBase() {
     @field:Column(name = "uuid", nullable = false)
     var uuid: UUID? = null
 
-    @field:Column(name = "title", nullable = false, length = 70)
-    var title: String? = null
+    @field:Column(name = "name", nullable = false, length = 70)
+    var name: String? = null
 
     @field:Column(name = "description", nullable = false)
     var description: String? = null
@@ -40,11 +46,52 @@ class ProjectJPA : PanacheEntityBase() {
     )
     var platforms: MutableList<PlatformJPA> = mutableListOf()
 
+    @field:ManyToOne(fetch = FetchType.LAZY)
+    var owner: UserJPA? = null
+
+    @field:OneToMany(
+        mappedBy = "project",
+        fetch = FetchType.LAZY,
+        cascade = [CascadeType.REMOVE]
+    )
+    var members: MutableList<ProjectMembers> = mutableListOf()
+
+    @field:Enumerated(EnumType.ORDINAL)
+    @field:Column(name = "status", nullable = false)
+    var status: ProjectStatus? = null
+
+    @field:Column(name = "created_at", nullable = false, updatable = false)
+    var createdAt: LocalDateTime = LocalDateTime.now()
+
+    @field:Column(name = "modified_at", nullable = false)
+    var modifiedAt: LocalDateTime = LocalDateTime.now()
+
     fun toProject(): Project = Project(
         uuid = this.uuid,
-        title = this.title!!,
+        name = this.name!!,
         description = this.description!!,
         color = this.color!!,
+        platforms = this.platforms.map {
+            it.toPlatformWithoutProject()
+        },
+        members = this.members.map {
+            it.toMember()
+        },
+        owner = this.owner?.toUserWithoutPassword(),
+        status = this.status,
+        createdAt = this.createdAt,
+        modifiedAt = this.modifiedAt
+    )
+
+    fun toProjectResume(): Project = Project(
+        uuid = this.uuid,
+        name = this.name!!,
+        description = this.description!!,
+        color = this.color!!,
+        owner = this.owner?.toUserWithoutPassword(),
+        status = this.status,
+        createdAt = this.createdAt,
+        modifiedAt = this.modifiedAt
     )
 }
 
@@ -52,13 +99,15 @@ class ProjectJPA : PanacheEntityBase() {
 class ProjectRepositoryJPA : EveBaseJPA<ProjectJPA, UUID>() {
     fun updateProject(project: Project) {
         this.update(
-            "title = :title, description = :description, color = :color WHERE uuid = :uuid",
+            "name = :name, description = :description, color = :color WHERE uuid = :uuid",
             mapOf(
-                "title" to project.title,
+                "name" to project.name,
                 "description" to project.description,
                 "color" to project.color,
                 "uuid" to project.uuid
             )
         )
     }
+
+    fun findAllWithStatusActive(): List<ProjectJPA> = list("status = '${ProjectStatus.ACTIVE}'")
 }

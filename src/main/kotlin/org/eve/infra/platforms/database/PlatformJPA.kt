@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import org.eve.domain.platforms.entities.Platform
 import org.eve.infra.projects.database.ProjectJPA
-import org.eve.utils.jpa.EveBaseJPA
+import org.eve.utils.entities.EveBaseJPA
 import java.util.UUID
 
 @Entity
@@ -36,6 +36,13 @@ class PlatformJPA {
         uuid = this.uuid,
         name = this.name!!,
         color = this.color!!,
+        project = this.project?.toProjectResume()
+    )
+
+    fun toPlatformWithoutProject(): Platform = Platform(
+        uuid = this.uuid,
+        name = this.name!!,
+        color = this.color!!,
     )
 }
 
@@ -50,5 +57,14 @@ class PlatformRepositoryJPA : EveBaseJPA<PlatformJPA, UUID>() {
                 "uuid" to platform.uuid
             )
         )
+    }
+
+    fun getPlatformsByProjectUUID(projectUUID: UUID): List<PlatformJPA> {
+        return this.find(
+            "project.uuid = :projectUUID",
+            mapOf(
+                "projectUUID" to projectUUID
+            )
+        ).list()
     }
 }

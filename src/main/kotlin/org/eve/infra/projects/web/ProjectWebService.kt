@@ -1,6 +1,7 @@
 package org.eve.infra.projects.web
 
 import jakarta.ws.rs.Consumes
+import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.PUT
@@ -12,6 +13,7 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eve.domain.projects.entities.Project
 import org.eve.domain.projects.usecase.ProjectUseCase
+import org.eve.utils.entities.DefaultResponse
 import java.util.UUID
 
 @Path("/projects")
@@ -74,5 +76,53 @@ class ProjectWebService(
         }
 
         return Response.ok(response).build()
+    }
+
+    @GET
+    @Path("/all")
+    fun getAllProjects(): Response {
+        val response = projectUseCase.getAllProjects()
+
+        if (response.error != null) {
+            return Response.status(
+                Response.Status.BAD_REQUEST
+            ).entity(response).build()
+        }
+
+        return Response.ok(response).build()
+    }
+
+    @POST
+    @Path("/{projectUUID}/add/{userUUID}")
+    fun addMemberToProject(
+        @PathParam(value = "projectUUID") projectUUID: UUID,
+        @PathParam(value = "userUUID") userUUID: UUID
+    ): Response {
+        val response = projectUseCase.addMemberToProject(projectUUID, userUUID)
+
+        if (response.error != null) {
+            return Response.status(
+                Response.Status.BAD_REQUEST
+            ).entity(response).build()
+        }
+
+        return Response.ok().build()
+    }
+
+    @DELETE
+    @Path("/{projectUUID}/remove/{userUUID}")
+    fun removeMemberFromProject(
+        @PathParam(value = "projectUUID") projectUUID: UUID,
+        @PathParam(value = "userUUID") userUUID: UUID
+    ): Response {
+        val response = projectUseCase.removeMemberFromProject(projectUUID, userUUID)
+
+        if (response.error != null) {
+            return Response.status(
+                Response.Status.BAD_REQUEST
+            ).entity(response).build()
+        }
+
+        return Response.ok().build()
     }
 }
