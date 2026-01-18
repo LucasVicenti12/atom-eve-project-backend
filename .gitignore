@@ -40,4 +40,4 @@ nb-configuration.xml
 # TLS Certificates
 .certs/
 
-jwt/
+src/main/resources/jwt/

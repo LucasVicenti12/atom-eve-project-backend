@@ -1,17 +1,5 @@
-mkdir jwt
+mkdir src\main\resources\jwt
 
-openssl genrsa -out jwt/private-rsa.pem 2048
+openssl genpkey -algorithm RSA -out src/main/resources/jwt/private.pem -pkeyopt rsa_keygen_bits:2048
 
-openssl pkcs8 -topk8 -nocrypt \
-  -inform PEM \
-  -in jwt/private-rsa.pem \
-  -outform PEM \
-  -out jwt/private.pem
-
-openssl rsa -pubout \
-  -in jwt/private-rsa.pem \
-  -out jwt/public.pem
-
-chmod 600 jwt/private-rsa.pem
-chmod 600 jwt/private.pem
-chmod 644 jwt/public.pem
+openssl rsa -pubout -in src/main/resources/jwt/private.pem -out src/main/resources/jwt/public.pem
