@@ -92,25 +92,23 @@ class ProjectUseCaseImplementation(
 
     override fun getPaginatedProjects(
         page: Int,
-        count: Int
+        count: Int,
+        all: Boolean
     ): DefaultResponse<Pagination<Project>> {
         try {
-            return DefaultResponse(
-                data = projectRepository.getPaginatedProjects(page, count)
-            )
+            val user = currentUser.get()
+
+            return if (all) {
+                DefaultResponse(
+                    data = projectRepository.getPaginatedProjectsAll(user.uuid!!, page, count)
+                )
+            } else {
+                DefaultResponse(
+                    data = projectRepository.getPaginatedProjectsMine(user.uuid!!, page, count)
+                )
+            }
         } catch (e: Exception) {
             logger.error("ERROR_ON_GET_PROJECT_PAGINATION", e)
-            return DefaultResponse(error = UNEXPECTED_ERROR)
-        }
-    }
-
-    override fun getAllProjects(): DefaultResponse<List<Project>> {
-        try {
-            return DefaultResponse(
-                data = projectRepository.getAllProjects()
-            )
-        } catch (e: Exception) {
-            logger.error("ERROR_ON_GET_ALL_PROJECTS", e)
             return DefaultResponse(error = UNEXPECTED_ERROR)
         }
     }
@@ -130,20 +128,20 @@ class ProjectUseCaseImplementation(
                 error = PROJECT_NOT_FOUND
             )
 
-            if(project.owner!!.uuid != user.uuid) {
+            if (project.owner!!.uuid != user.uuid) {
                 return DefaultResponse(
                     error = PROJECT_YOU_ARENT_THE_OWNER
                 )
             }
 
-            if(user.uuid == userUUID){
+            if (user.uuid == userUUID) {
                 return DefaultResponse(
                     error = PROJECT_YOU_CANNOT_ADD_YOURSELF
                 )
             }
 
-            val added = project.members?.find {
-                x -> x.user.uuid == userUUID
+            val added = project.members?.find { x ->
+                x.user.uuid == userUUID
             }
 
             if (added != null) {
@@ -176,7 +174,7 @@ class ProjectUseCaseImplementation(
                 error = PROJECT_NOT_FOUND
             )
 
-            if(project.owner!!.uuid != user.uuid) {
+            if (project.owner!!.uuid != user.uuid) {
                 return DefaultResponse(
                     error = PROJECT_YOU_ARENT_THE_OWNER
                 )

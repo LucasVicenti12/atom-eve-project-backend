@@ -13,7 +13,6 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eve.domain.projects.entities.Project
 import org.eve.domain.projects.usecase.ProjectUseCase
-import org.eve.utils.entities.DefaultResponse
 import java.util.UUID
 
 @Path("/projects")
@@ -63,25 +62,13 @@ class ProjectWebService(
     }
 
     @GET
-    fun getPaginatedProjects(
-        @QueryParam(value = "page") page: Int,
-        @QueryParam(value = "count") count: Int
-    ): Response {
-        val response = projectUseCase.getPaginatedProjects(page, count)
-
-        if (response.error != null) {
-            return Response.status(
-                Response.Status.BAD_REQUEST
-            ).entity(response).build()
-        }
-
-        return Response.ok(response).build()
-    }
-
-    @GET
     @Path("/all")
-    fun getAllProjects(): Response {
-        val response = projectUseCase.getAllProjects()
+    fun getPaginatedProjectsAll(
+        @QueryParam(value = "page") page: Int,
+        @QueryParam(value = "count") count: Int,
+        @QueryParam(value = "all") all: Boolean?
+    ): Response {
+        val response = projectUseCase.getPaginatedProjects(page, count, all ?: true)
 
         if (response.error != null) {
             return Response.status(

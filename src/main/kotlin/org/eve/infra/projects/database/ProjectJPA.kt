@@ -1,6 +1,7 @@
 package org.eve.infra.projects.database
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
+import io.quarkus.hibernate.orm.panache.PanacheQuery
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
@@ -21,6 +22,7 @@ import org.eve.infra.users.database.UserJPA
 import org.eve.utils.entities.EveBaseJPA
 import java.time.LocalDateTime
 import java.util.UUID
+import io.quarkus.panache.common.Page
 
 @Entity
 @Table(name = "projects")
@@ -109,5 +111,42 @@ class ProjectRepositoryJPA : EveBaseJPA<ProjectJPA, UUID>() {
         )
     }
 
-    fun findAllWithStatusActive(): List<ProjectJPA> = list("status = '${ProjectStatus.ACTIVE}'")
+    fun findProjectsByMember(
+        userUUID: UUID,
+        page: Int,
+        count: Int
+    ): PanacheQuery<ProjectJPA> {
+        return find(
+            """
+            SELECT DISTINCT p
+            FROM ProjectJPA p
+            LEFT JOIN p.members m
+            WHERE m.user.uuid = :userUUID OR p.owner.uuid = :userUUID
+            """.trimIndent(),
+            mapOf(
+                "userUUID" to userUUID
+            )
+        ).page(
+            Page.of(page, count)
+        )
+    }
+
+    fun findProjectsByOwner(
+        userUUID: UUID,
+        page: Int,
+        count: Int
+    ): PanacheQuery<ProjectJPA> {
+        return find(
+            """
+            SELECT p
+            FROM ProjectJPA p
+            WHERE p.owner.uuid = :userUUID
+            """.trimIndent(),
+            mapOf(
+                "userUUID" to userUUID
+            )
+        ).page(
+            Page.of(page, count)
+        )
+    }
 }

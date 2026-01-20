@@ -9,8 +9,8 @@ interface ProjectRepository {
     fun updateProject(project: Project): Project?
 
     fun getProjectByUUID(uuid: UUID): Project?
-    fun getPaginatedProjects(page: Int, count: Int): Pagination<Project>
-    fun getAllProjects(): List<Project>
+    fun getPaginatedProjectsAll(userUUID: UUID, page: Int, count: Int): Pagination<Project>
+    fun getPaginatedProjectsMine(userUUID: UUID, page: Int, count: Int): Pagination<Project>
 
     fun addMemberToProject(projectUUID: UUID, userUUID: UUID)
     fun removeMemberFromProject(projectUUID: UUID, userUUID: UUID)

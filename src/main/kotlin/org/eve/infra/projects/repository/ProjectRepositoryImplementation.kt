@@ -48,11 +48,12 @@ class ProjectRepositoryImplementation(
         projectRepositoryJPA.findById(uuid)?.toProject()
 
     @Transactional
-    override fun getPaginatedProjects(
+    override fun getPaginatedProjectsAll(
+        userUUID: UUID,
         page: Int,
         count: Int
     ): Pagination<Project> {
-        val paginated = projectRepositoryJPA.findPaginated(page, count)
+        val paginated = projectRepositoryJPA.findProjectsByMember(userUUID, page, count)
 
         val items = paginated.list<ProjectJPA>()
             .map {
@@ -68,11 +69,26 @@ class ProjectRepositoryImplementation(
         )
     }
 
-    @Transactional
-    override fun getAllProjects(): List<Project> = projectRepositoryJPA.findAllWithStatusActive()
-        .map {
-            it.toProjectResume()
-        }
+    override fun getPaginatedProjectsMine(
+        userUUID: UUID,
+        page: Int,
+        count: Int
+    ): Pagination<Project> {
+        val paginated = projectRepositoryJPA.findProjectsByOwner(userUUID, page, count)
+
+        val items = paginated.list<ProjectJPA>()
+            .map {
+                it.toProject()
+            }
+
+        return Pagination(
+            items = items,
+            totalPages = paginated.pageCount(),
+            totalCount = paginated.count(),
+            page = page,
+            count = count
+        )
+    }
 
     @Transactional
     override fun addMemberToProject(projectUUID: UUID, userUUID: UUID) {
