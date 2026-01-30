@@ -14,13 +14,13 @@ import org.eve.infra.auth.service.TokenService
 import io.vertx.core.impl.logging.LoggerFactory
 import org.eve.domain.auth.exceptions.AUTH_INVALID_CREDENTIALS
 import org.eve.domain.users.entities.User
-import org.eve.utils.functions.CurrentUser
+import org.eve.utils.functions.Session
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @ApplicationScoped
 class AuthUseCaseImplementation(
     private val userRepository: UserRepository,
-    private val currentUser: CurrentUser
+    private val session: Session
 ) : AuthUseCase {
     private val logger by lazy {
         LoggerFactory.getLogger(AuthUseCaseImplementation::class.java)
@@ -66,7 +66,7 @@ class AuthUseCaseImplementation(
     override fun me(): DefaultResponse<User> {
         try{
             return DefaultResponse(
-                data = currentUser.get()
+                data = session.getUser()
             )
         }catch (e: Exception) {
             logger.error("ERROR_ON_GET_ME", e)

@@ -16,14 +16,14 @@ import org.eve.domain.users.repository.UserRepository
 import org.eve.utils.entities.DefaultResponse
 import org.eve.utils.entities.Pagination
 import org.eve.utils.exceptions.UNEXPECTED_ERROR
-import org.eve.utils.functions.CurrentUser
+import org.eve.utils.functions.Session
 import java.util.UUID
 
 @ApplicationScoped
 class ProjectUseCaseImplementation(
     private val projectRepository: ProjectRepository,
     private val userRepository: UserRepository,
-    private val currentUser: CurrentUser
+    private val session: Session
 ) : ProjectUseCase {
     private val logger by lazy {
         LoggerFactory.getLogger(ProjectUseCaseImplementation::class.java)
@@ -39,7 +39,7 @@ class ProjectUseCaseImplementation(
                 return DefaultResponse(error = PROJECT_COLOR_IS_EMPTY)
             }
 
-            val user = currentUser.get()
+            val user = session.getUser()
 
             project.owner = user
 
@@ -96,7 +96,7 @@ class ProjectUseCaseImplementation(
         all: Boolean
     ): DefaultResponse<Pagination<Project>> {
         try {
-            val user = currentUser.get()
+            val user = session.getUser()
 
             return if (all) {
                 DefaultResponse(
@@ -118,7 +118,7 @@ class ProjectUseCaseImplementation(
         userUUID: UUID
     ): DefaultResponse<Unit> {
         try {
-            val user = currentUser.get()
+            val user = session.getUser()
 
             userRepository.getUserByUUID(userUUID) ?: return DefaultResponse(
                 error = USER_NOT_FOUND
@@ -164,7 +164,7 @@ class ProjectUseCaseImplementation(
         userUUID: UUID
     ): DefaultResponse<Unit> {
         try {
-            val user = currentUser.get()
+            val user = session.getUser()
 
             userRepository.getUserByUUID(userUUID) ?: return DefaultResponse(
                 error = USER_NOT_FOUND
