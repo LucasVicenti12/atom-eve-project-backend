@@ -13,13 +13,16 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eve.domain.projects.entities.Project
 import org.eve.domain.projects.usecase.ProjectUseCase
+import org.eve.utils.annotations.ProjectRequired
+import org.eve.utils.functions.Session
 import java.util.UUID
 
 @Path("/projects")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 class ProjectWebService(
-    private val projectUseCase: ProjectUseCase
+    private val projectUseCase: ProjectUseCase,
+    private val session: Session,
 ) {
     @POST
     fun createProject(project: Project): Response {
@@ -80,12 +83,14 @@ class ProjectWebService(
     }
 
     @POST
-    @Path("/{projectUUID}/add/{userUUID}")
+    @Path("/add/{userUUID}")
+    @ProjectRequired
     fun addMemberToProject(
-        @PathParam(value = "projectUUID") projectUUID: UUID,
         @PathParam(value = "userUUID") userUUID: UUID
     ): Response {
-        val response = projectUseCase.addMemberToProject(projectUUID, userUUID)
+        val project = session.getProject()
+
+        val response = projectUseCase.addMemberToProject(project.uuid!!, userUUID)
 
         if (response.error != null) {
             return Response.status(
@@ -97,12 +102,14 @@ class ProjectWebService(
     }
 
     @DELETE
-    @Path("/{projectUUID}/remove/{userUUID}")
+    @Path("/remove/{userUUID}")
+    @ProjectRequired
     fun removeMemberFromProject(
-        @PathParam(value = "projectUUID") projectUUID: UUID,
         @PathParam(value = "userUUID") userUUID: UUID
     ): Response {
-        val response = projectUseCase.removeMemberFromProject(projectUUID, userUUID)
+        val project = session.getProject()
+
+        val response = projectUseCase.removeMemberFromProject(project.uuid!!, userUUID)
 
         if (response.error != null) {
             return Response.status(

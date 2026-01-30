@@ -12,21 +12,23 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eve.domain.platforms.entities.Platform
 import org.eve.domain.platforms.usecase.PlatformUseCase
+import org.eve.utils.annotations.ProjectRequired
+import org.eve.utils.functions.Session
 import java.util.UUID
 
 @Path("/platforms")
+@ProjectRequired
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 class PlatformWebService(
-    private val platformUseCase: PlatformUseCase
+    private val platformUseCase: PlatformUseCase,
+    private val session: Session
 ) {
     @POST
-    @Path("/{projectUUID}")
-    fun createPlatform(
-        platform: Platform,
-        @PathParam(value = "projectUUID") projectUUID: UUID,
-    ): Response {
-        val response = platformUseCase.createPlatform(platform, projectUUID)
+    fun createPlatform(platform: Platform): Response {
+        val project = session.getProject()
+
+        val response = platformUseCase.createPlatform(platform, project.uuid!!)
 
         if (response.error != null) {
             return Response.status(
@@ -81,11 +83,11 @@ class PlatformWebService(
     }
 
     @GET
-    @Path("/all/{uuid}")
-    fun getAllPlatforms(
-        @PathParam(value = "uuid") uuid: UUID
-    ): Response {
-        val response = platformUseCase.getAllPlatforms(uuid)
+    @Path("/all")
+    fun getAllPlatforms(): Response {
+        val project = session.getProject()
+
+        val response = platformUseCase.getAllPlatforms(project.uuid!!)
 
         if (response.error != null) {
             return Response.status(
