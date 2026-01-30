@@ -1,8 +1,6 @@
 package org.eve.infra.auth.filters
 
-import io.vertx.ext.web.RoutingContext
 import jakarta.annotation.Priority
-import jakarta.inject.Inject
 import jakarta.ws.rs.Priorities
 import jakarta.ws.rs.container.ContainerRequestContext
 import jakarta.ws.rs.container.ContainerRequestFilter
@@ -21,9 +19,6 @@ import java.util.UUID
 class ProjectFilter(
     private val projectRepository: ProjectRepository,
 ) : ContainerRequestFilter {
-    @Inject
-    private lateinit var routingContext: RoutingContext
-
     override fun filter(ctx: ContainerRequestContext) {
         val projectUUID = ctx.getHeaderString("Project-UUID")
 
@@ -55,6 +50,6 @@ class ProjectFilter(
             return
         }
 
-        routingContext.put("project", project)
+        ctx.setProperty("project", project)
     }
 }
