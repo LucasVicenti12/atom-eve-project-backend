@@ -16,8 +16,8 @@ class PlatformRepositoryImplementation(
 ) : PlatformRepository {
     @Transactional
     override fun createPlatform(
+        projectUUID: UUID,
         platform: Platform,
-        projectUUID: UUID
     ): Platform? {
         val projectJPA = ProjectJPA().apply {
             this.uuid = projectUUID
@@ -47,10 +47,15 @@ class PlatformRepositoryImplementation(
 
     @Transactional
     override fun getPaginatedPlatforms(
+        projectUUID: UUID,
         page: Int,
         count: Int
     ): Pagination<Platform> {
-        val paginated = platformRepositoryJPA.findPaginated(page, count)
+        val paginated = platformRepositoryJPA.getPaginatedPlatformsByProjectUUID(
+            projectUUID,
+            page,
+            count
+        )
 
         val items = paginated.list<PlatformJPA>()
             .map {

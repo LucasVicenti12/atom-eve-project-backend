@@ -1,4 +1,4 @@
-package org.eve.infra.platforms.web
+package org.eve.infra.tasks.web
 
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.GET
@@ -10,21 +10,21 @@ import jakarta.ws.rs.Produces
 import jakarta.ws.rs.QueryParam
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import org.eve.domain.platforms.entities.Platform
-import org.eve.domain.platforms.usecase.PlatformUseCase
+import org.eve.domain.tasks.entities.Task
+import org.eve.domain.tasks.usecase.TaskUseCase
 import org.eve.utils.annotations.ProjectRequired
 import java.util.UUID
 
-@Path("/platforms")
+@Path("/tasks")
 @ProjectRequired
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class PlatformWebService(
-    private val platformUseCase: PlatformUseCase
+class TaskWebService(
+    private val taskUseCase: TaskUseCase
 ) {
     @POST
-    fun createPlatform(platform: Platform): Response {
-        val response = platformUseCase.createPlatform(platform)
+    fun createTask(task: Task): Response {
+        val response = taskUseCase.createTask(task)
 
         if (response.error != null) {
             return Response.status(
@@ -36,8 +36,8 @@ class PlatformWebService(
     }
 
     @PUT
-    fun updatePlatform(platform: Platform): Response {
-        val response = platformUseCase.updatePlatform(platform)
+    fun updateTask(task: Task): Response {
+        val response = taskUseCase.updateTask(task)
 
         if (response.error != null) {
             return Response.status(
@@ -50,8 +50,8 @@ class PlatformWebService(
 
     @GET
     @Path("/uuid/{uuid}")
-    fun getPlatformByUUID(@PathParam(value = "uuid") uuid: UUID): Response {
-        val response = platformUseCase.getPlatformByUUID(uuid)
+    fun getTaskByUUID(@PathParam(value = "uuid") uuid: UUID): Response {
+        val response = taskUseCase.getTaskByUUID(uuid)
 
         if (response.error != null) {
             return Response.status(
@@ -63,11 +63,11 @@ class PlatformWebService(
     }
 
     @GET
-    fun getPaginatedPlatforms(
+    fun getPaginatedTasks(
         @QueryParam(value = "page") page: Int,
         @QueryParam(value = "count") count: Int
     ): Response {
-        val response = platformUseCase.getPaginatedPlatforms(page, count)
+        val response = taskUseCase.getPaginatedTasks(page, count)
 
         if (response.error != null) {
             return Response.status(
@@ -80,8 +80,8 @@ class PlatformWebService(
 
     @GET
     @Path("/all")
-    fun getAllPlatforms(): Response {
-        val response = platformUseCase.getAllPlatforms()
+    fun getAllTasks(): Response {
+        val response = taskUseCase.getAllTasks()
 
         if (response.error != null) {
             return Response.status(

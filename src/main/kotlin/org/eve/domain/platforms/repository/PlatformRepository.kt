@@ -5,10 +5,10 @@ import org.eve.utils.entities.Pagination
 import java.util.UUID
 
 interface PlatformRepository {
-    fun createPlatform(platform: Platform, projectUUID: UUID): Platform?
+    fun createPlatform(projectUUID: UUID, platform: Platform): Platform?
     fun updatePlatform(platform: Platform): Platform?
     fun getPlatformByUUID(uuid: UUID): Platform?
 
-    fun getPaginatedPlatforms(page: Int, count: Int): Pagination<Platform>
+    fun getPaginatedPlatforms(projectUUID: UUID, page: Int, count: Int): Pagination<Platform>
     fun getAllPlatforms(projectUUID: UUID): List<Platform>
 }

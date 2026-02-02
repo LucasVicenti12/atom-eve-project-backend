@@ -6,10 +6,10 @@ import org.eve.utils.entities.Pagination
 import java.util.UUID
 
 interface PlatformUseCase {
-    fun createPlatform(platform: Platform, projectUUID: UUID): DefaultResponse<Platform>
+    fun createPlatform(platform: Platform): DefaultResponse<Platform>
     fun updatePlatform(platform: Platform): DefaultResponse<Platform>
     fun getPlatformByUUID(uuid: UUID): DefaultResponse<Platform>
 
     fun getPaginatedPlatforms(page: Int, count: Int): DefaultResponse<Pagination<Platform>>
-    fun getAllPlatforms(projectUUID: UUID): DefaultResponse<List<Platform>>
+    fun getAllPlatforms(): DefaultResponse<List<Platform>>
 }

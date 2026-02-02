@@ -1,4 +1,4 @@
-package org.eve.infra.platforms.database
+package org.eve.infra.tasks.database
 
 import io.quarkus.hibernate.orm.panache.PanacheQuery
 import io.quarkus.panache.common.Page
@@ -12,56 +12,63 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import org.eve.domain.platforms.entities.Platform
+import org.eve.domain.tasks.entities.Task
+import org.eve.infra.platforms.database.PlatformJPA
 import org.eve.infra.projects.database.ProjectJPA
 import org.eve.utils.entities.EveBaseJPA
 import java.util.UUID
 
 @Entity
-@Table(name = "platforms")
-class PlatformJPA {
+@Table(name = "tasks")
+class TaskJPA {
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.UUID)
     var uuid: UUID? = null
 
-    @field:Column(name = "name", nullable = false, length = 70)
-    var name: String? = null
+    @field:Column(name = "title", nullable = false, length = 120)
+    var title: String? = null
 
-    @field:Column(name = "color", nullable = false, length = 10)
-    var color: String? = null
+    @field:Column(name = "description", nullable = false)
+    var description: String? = null
 
     @field:ManyToOne(fetch = FetchType.LAZY)
     @field:JoinColumn(name = "project_uuid", nullable = false)
     var project: ProjectJPA? = null
 
-    fun toPlatform(): Platform = Platform(
+    @field:ManyToOne(fetch = FetchType.LAZY)
+    @field:JoinColumn(name = "platform_uuid", nullable = false)
+    var platform: PlatformJPA? = null
+
+    fun toTask(): Task = Task(
         uuid = this.uuid,
-        name = this.name!!,
-        color = this.color!!,
-        project = this.project?.toProjectResume()
+        title = this.title!!,
+        description = this.description!!,
+        platform = this.platform!!.toPlatform(),
+        project = this.project!!.toProject()
     )
 
-    fun toPlatformWithoutProject(): Platform = Platform(
+    fun toTaskWithoutProjectAndPlatform(): Task = Task(
         uuid = this.uuid,
-        name = this.name!!,
-        color = this.color!!,
+        title = this.title!!,
+        description = this.description!!
     )
 }
 
 @ApplicationScoped
-class PlatformRepositoryJPA : EveBaseJPA<PlatformJPA, UUID>() {
-    fun updatePlatform(platform: Platform) {
+class TaskRepositoryJPA : EveBaseJPA<TaskJPA, UUID>() {
+    fun updateTask(task: Task) {
         this.update(
-            "name = :name, color = :color WHERE uuid = :uuid",
+            "title = :title, description = :description, platform = :platform WHERE uuid = :uuid",
             mapOf(
-                "name" to platform.name,
-                "color" to platform.color,
-                "uuid" to platform.uuid
+                "title" to task.title,
+                "description" to task.description,
+                "platform" to task.platform!!.uuid!!,
+                "uuid" to task.uuid
             )
         )
     }
 
-    fun getPlatformsByProjectUUID(projectUUID: UUID): List<PlatformJPA> {
+    fun getTaskByProjectUUID(projectUUID: UUID): List<TaskJPA> {
         return this.find(
             "project.uuid = :projectUUID",
             mapOf(
@@ -70,11 +77,11 @@ class PlatformRepositoryJPA : EveBaseJPA<PlatformJPA, UUID>() {
         ).list()
     }
 
-    fun getPaginatedPlatformsByProjectUUID(
+    fun getPaginatedTaskByProjectUUID(
         projectUUID: UUID,
         page: Int,
         count: Int
-    ): PanacheQuery<PlatformJPA> {
+    ): PanacheQuery<TaskJPA> {
         return this.find(
             "project.uuid = :projectUUID",
             mapOf(

@@ -11,18 +11,22 @@ import org.eve.domain.platforms.usecase.PlatformUseCase
 import org.eve.utils.entities.DefaultResponse
 import org.eve.utils.entities.Pagination
 import org.eve.utils.exceptions.UNEXPECTED_ERROR
+import org.eve.utils.functions.Session
 import java.util.UUID
 
 @ApplicationScoped
 class PlatformUseCaseImplementation(
-    private val platformRepository: PlatformRepository
+    private val platformRepository: PlatformRepository,
+    private val session: Session
 ) : PlatformUseCase {
     private val logger by lazy {
         LoggerFactory.getLogger(PlatformUseCaseImplementation::class.java)
     }
 
-    override fun createPlatform(platform: Platform, projectUUID: UUID): DefaultResponse<Platform> {
+    override fun createPlatform(platform: Platform): DefaultResponse<Platform> {
         try {
+            val project = session.getProject()
+
             if (platform.name.isNullOrBlank()) {
                 return DefaultResponse(error = PLATFORM_NAME_IS_EMPTY)
             }
@@ -32,7 +36,7 @@ class PlatformUseCaseImplementation(
             }
 
             return DefaultResponse(
-                data = platformRepository.createPlatform(platform, projectUUID)
+                data = platformRepository.createPlatform(project.uuid!!, platform)
             )
         } catch (e: Exception) {
             logger.error("ERROR_ON_CREATE_PLATFORM", e)
@@ -80,8 +84,10 @@ class PlatformUseCaseImplementation(
 
     override fun getPaginatedPlatforms(page: Int, count: Int): DefaultResponse<Pagination<Platform>> {
         try {
+            val project = session.getProject()
+
             return DefaultResponse(
-                data = platformRepository.getPaginatedPlatforms(page, count)
+                data = platformRepository.getPaginatedPlatforms(project.uuid!!, page, count)
             )
         } catch (e: Exception) {
             logger.error("ERROR_ON_GET_PLATFORM_PAGINATION", e)
@@ -89,10 +95,12 @@ class PlatformUseCaseImplementation(
         }
     }
 
-    override fun getAllPlatforms(projectUUID: UUID): DefaultResponse<List<Platform>> {
+    override fun getAllPlatforms(): DefaultResponse<List<Platform>> {
         try {
+            val project = session.getProject()
+
             return DefaultResponse(
-                data = platformRepository.getAllPlatforms(projectUUID)
+                data = platformRepository.getAllPlatforms(project.uuid!!)
             )
         } catch (e: Exception) {
             logger.error("ERROR_ON_GET_ALL_PLATFORMS", e)
